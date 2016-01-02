@@ -1,10 +1,16 @@
+"use strict";
+
 var express = require('express');
 var bodyParser = require('body-parser');
+var Firebase = require("firebase");
 
 var ref = new Firebase('https://boozebot.firebaseio.com');
 var recipesRef = ref.child("Recipes");
+var usersRef        = ref.child("Users");
+var bottlesRef      = ref.child("Bottles");
+var queueRef        = new Firebase('https://boozebot.firebaseio.com/drinkQueue/tasks');
 
-const conversionRation = 29.5735;
+const conversionRatio = 29.5735;
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,25 +42,30 @@ app.get('/', function(req, res) {
 app.post('/queue_drink', function(req, res) {
   const userName = req.body.user;
   const drinkName = req.body.drink;
+  let errors = []; 
 
   if (!userName || !drinkName) {
-    return res.status(400).jsonp({"error":"Missing user or drink name!"});
-  }
-  console.log("Pouring " + drinkName + " for " + user);
+    errors.push("Missing user or drink name!");
+  } 
+  console.log("Pouring " + drinkName + " for " + userName);
 
   // Get recipe
-  const recipe = recipesRef.child(drinkName).once("value", recipeSnapshot => {
-    if (recipeSnapshot == null) return res.status(400).jsonp({"error":"Drink does not exist!"}); 
+  recipesRef.child(drinkName).once("value", recipeSnapshot => {
+    if (recipeSnapshot.val() === null) { 
+      res.status(400).jsonp({"error":"Drink does not exist!"}); 
+      return;
+    }
 
     // Get transaction and store recipe used in transaction
     let curTransaction = {
       recipeUsed: drinkName,
       totalCost: 0, 
-      numStandardDrins: 0
+      numStandardDrinks: 0
     };
 
     // Get list of ingredients from recipe
     let ingredients = [];
+    let ingredientCounter = 1;
     recipeSnapshot.forEach(ingredientSnapshot => {
       const ingredient = ingredientSnapshot.val();
       const amount = parseFloat(ingredient.amount);
@@ -66,11 +77,15 @@ app.post('/queue_drink', function(req, res) {
         const bottle = bottleSnapshot.val();
         const costPerFlOz = parseFloat(bottle.costPerFlOz);
 
-        if (bottle == null) return res.status(400).jsonp({"error":"No more ${ingredient}!"}); 
+        if (bottle == null) { 
+          res.status(400).jsonp({"error":"No more ${ingredient}!"}); 
+          return;
+        }
 
         // If there's not enough liquid in the bottle:
-        if (parseFloat(bottle.amountRemaining) < amount * converstionRatio) {
-              return res.status(400).jsonp({"error":"Not enough ${ingredient} remaining"});
+        if (parseFloat(bottle.amountRemaining) < amount * conversionRatio) {
+          res.status(400).jsonp({"error":"Not enough ${ingredient} remaining"});
+          return;
         }
 
         // Add line item to transaction
@@ -84,7 +99,7 @@ app.post('/queue_drink', function(req, res) {
         // *****DECREMENT AMOUNT LEFT IN BOTTLE***** 
 
         // Increment standard drink count, ingredient count, and total cost
-        curTransation.numStandardDrinks += (2 * amount * parseFloat(bottle.proof)) / 200;
+        curTransaction.numStandardDrinks += (2 * amount * parseFloat(bottle.proof)) / 200;
         curTransaction.totalCost += costPerFlOz * amount;
         ingredientCounter += 1;
       });
@@ -93,19 +108,24 @@ app.post('/queue_drink', function(req, res) {
     usersRef.child(userName).once("value", userSnapshot => {
       const user = userSnapshot.val();
       // Check if username exists
-      if (user === null) return res.status(400).jsonp({"error": "Invalid User ${userName}"});
+      if (user === null) { 
+        res.status(400).jsonp({"error": "Invalid User ${userName}"});
+        return;
+      }
 
       curTransaction.ingredientCount = ingredientCounter;
-      curTransaction.timestamp = generateTimestamp(); // do this
+      curTransaction.timestamp = generateTimestamp();
 
       // Add transaction to user's transaction list
-      usersRef.chlid(userName).child("Transactions").push(curTransaction);
+      usersRef.child(userName).child("Transactions").push(curTransaction);
       // Add drink transaction to queue
       queueRef.push(curTransaction);
+
+      // This has to be in here because javascript is a fuck.
+      console.log("Success!");
+      res.status(200).send("success!");
     });
   });
-
-  res.status(200).send("success!");
 });
 
 var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
