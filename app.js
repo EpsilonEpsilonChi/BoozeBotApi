@@ -40,8 +40,8 @@ app.get('/', function(req, res) {
 });
 
 app.post('/queue_drink', function(req, res) {
-  const userName = req.body.user;
-  const drinkName = req.body.drink;
+  var userName = req.body.user;
+  var drinkName = req.body.drink;
   let errors = []; 
 
   if (!userName || !drinkName) {
@@ -67,15 +67,15 @@ app.post('/queue_drink', function(req, res) {
     let ingredients = [];
     let ingredientCounter = 1;
     recipeSnapshot.forEach(function(ingredientSnapshot) {
-      const ingredient = ingredientSnapshot.val();
-      const amount = parseFloat(ingredient.amount);
+      var ingredient = ingredientSnapshot.val();
+      var amount = parseFloat(ingredient.amount);
 
       ingredients.push(ingredient); 
 
       // Get price for ingredient from bottle.
       bottlesRef.child(ingredient.type).once("value", function(bottleSnapshot) {
-        const bottle = bottleSnapshot.val();
-        const costPerFlOz = parseFloat(bottle.costPerFlOz);
+        var bottle = bottleSnapshot.val();
+        var costPerFlOz = parseFloat(bottle.costPerFlOz);
 
         if (bottle == null) { 
           res.status(400).jsonp({"error":"No more ${ingredient}!"}); 
@@ -106,7 +106,7 @@ app.post('/queue_drink', function(req, res) {
     });
 
     usersRef.child(userName).once("value", function(userSnapshot) {
-      const user = userSnapshot.val();
+      var user = userSnapshot.val();
       // Check if username exists
       if (user === null) { 
         res.status(400).jsonp({"error": "Invalid User ${userName}"});
