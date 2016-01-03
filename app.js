@@ -42,7 +42,7 @@ app.get('/', function(req, res) {
 app.post('/queue_drink', function(req, res) {
   var userName = req.body.user;
   var drinkName = req.body.drink;
-  let errors = []; 
+  var errors = []; 
 
   if (!userName || !drinkName) {
     errors.push("Missing user or drink name!");
