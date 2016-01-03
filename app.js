@@ -50,7 +50,7 @@ app.post('/queue_drink', function(req, res) {
   console.log("Pouring " + drinkName + " for " + userName);
 
   // Get recipe
-  recipesRef.child(drinkName).once("value", recipeSnapshot => {
+  recipesRef.child(drinkName).once("value", function(recipeSnapshot) {
     if (recipeSnapshot.val() === null) { 
       res.status(400).jsonp({"error":"Drink does not exist!"}); 
       return;
@@ -66,14 +66,14 @@ app.post('/queue_drink', function(req, res) {
     // Get list of ingredients from recipe
     let ingredients = [];
     let ingredientCounter = 1;
-    recipeSnapshot.forEach(ingredientSnapshot => {
+    recipeSnapshot.forEach(function(ingredientSnapshot) {
       const ingredient = ingredientSnapshot.val();
       const amount = parseFloat(ingredient.amount);
 
       ingredients.push(ingredient); 
 
       // Get price for ingredient from bottle.
-      bottlesRef.child(ingredient.type).once("value", bottleSnapshot => {
+      bottlesRef.child(ingredient.type).once("value", function(bottleSnapshot) {
         const bottle = bottleSnapshot.val();
         const costPerFlOz = parseFloat(bottle.costPerFlOz);
 
@@ -105,7 +105,7 @@ app.post('/queue_drink', function(req, res) {
       });
     });
 
-    usersRef.child(userName).once("value", userSnapshot => {
+    usersRef.child(userName).once("value", function(userSnapshot) {
       const user = userSnapshot.val();
       // Check if username exists
       if (user === null) { 
