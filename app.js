@@ -10,7 +10,7 @@ var usersRef        = ref.child("Users");
 var bottlesRef      = ref.child("Bottles");
 var queueRef        = new Firebase('https://boozebot.firebaseio.com/drinkQueue/tasks');
 
-const conversionRatio = 29.5735;
+var conversionRatio = 29.5735;
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
