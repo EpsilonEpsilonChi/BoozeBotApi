@@ -57,15 +57,15 @@ app.post('/queue_drink', function(req, res) {
     }
 
     // Get transaction and store recipe used in transaction
-    let curTransaction = {
+    var curTransaction = {
       recipeUsed: drinkName,
       totalCost: 0, 
       numStandardDrinks: 0
     };
 
     // Get list of ingredients from recipe
-    let ingredients = [];
-    let ingredientCounter = 1;
+    var ingredients = [];
+    var ingredientCounter = 1;
     recipeSnapshot.forEach(function(ingredientSnapshot) {
       var ingredient = ingredientSnapshot.val();
       var amount = parseFloat(ingredient.amount);
