@@ -120,6 +120,7 @@ app.post('/queue_drink', function(req, res) {
       // Add transaction to user's transaction list
       usersRef.child(userName).child("Transactions").push(curTransaction);
       // Add drink transaction to queue
+      console.log(curTransaction);
       queueRef.push(curTransaction);
 
       // This has to be in here because javascript is a fuck.
