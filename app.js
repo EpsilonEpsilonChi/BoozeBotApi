@@ -60,7 +60,8 @@ app.post('/queue_drink', function(req, res) {
     var curTransaction = {
       recipeUsed: drinkName,
       totalCost: 0, 
-      numStandardDrinks: 0
+      numStandardDrinks: 0,
+      username: userName
     };
 
     // Get list of ingredients from recipe
