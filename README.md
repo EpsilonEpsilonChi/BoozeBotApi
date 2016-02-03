@@ -27,6 +27,7 @@ POST /queue_drink {user: "user_name", drink: "drink_name"}
 
 ## SSH
 ssh 56874b262d5271956d00015e@boozebot-boozebotapi.rhcloud.com
+
 ** requires you have been granted permission on OpenShift
 
 ## Notes
