@@ -12,7 +12,9 @@ POST /queue_drink {user: "user_name", drink: "drink_name"}
 * In order to deploy, you will need to be granted permission from @kenzshelley.
   This will require that you set up an OpenShift account, and then email
   kenzshelley@gmail.com requesting permission.
+
 * You will need to add your PUBLIC ssh key to https://openshift.redhat.com/app/console/settings so that you can be authenticated when deploying.
+
 * After you have permissions, you must add a new remote to your git config for
   this repo: 
 
