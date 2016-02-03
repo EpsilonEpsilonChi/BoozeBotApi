@@ -15,12 +15,13 @@ POST /queue_drink {user: "user_name", drink: "drink_name"}
 
 * You will need to add your PUBLIC ssh key to https://openshift.redhat.com/app/console/settings so that you can be authenticated when deploying.
 
-* After you have permissions, you must add a new remote to your git config for
+* After you have permissions, you must add a new remote to your .git/config for
   this repo: 
 
   ```  
-  url = ssh://56874b262d5271956d00015e@boozebot-boozebotapi.rhcloud.com/~/git/boozebot.git/
-  fetch = +refs/heads/*:refs/remotes/origin/*
+  [remote "deploy"]
+    url = ssh://56874b262d5271956d00015e@boozebot-boozebotapi.rhcloud.com/~/git/boozebot.git/
+    fetch = +refs/heads/*:refs/remotes/origin/*
   ```
 * Finally, pushing to this remote will automatically trigger a deploy: 
 
